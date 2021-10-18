@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="GridIO.cpp" />
+    <ClCompile Include="CameraSettings.cpp" />
+    <ClCompile Include="EBO.cpp" />
+    <ClCompile Include="GridSettings.cpp" />
+    <ClCompile Include="Output.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="VAO.cpp" />
+    <ClCompile Include="VBO.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EBO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VAO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VBO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GridSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="default.frag">
+      <Filter>External Resources\Shaders</Filter>
+    </None>
+    <None Include="default.vert">
+      <Filter>External Resources\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0ead8279-68d0-4ec4-b050-2e6915522366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External Resources">
+      <UniqueIdentifier>{8815c68e-ba88-4692-a898-a56c2a3aa977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External Resources\Shaders">
+      <UniqueIdentifier>{2d701b61-46d4-4c78-a413-5ed8cf40a2e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External Resources\Textures">
+      <UniqueIdentifier>{c7414db6-966a-4512-be6b-6c2887af17a8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="kockle.jpg">
+      <Filter>External Resources\Textures</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

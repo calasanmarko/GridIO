@@ -1,0 +1,26 @@
+﻿<Window x:Class="BlockIOInterface.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BlockIOInterface"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        WindowStartupLocation="Manual" Left="0" Top="250"
+        Loaded="Window_Loaded"
+        Closed="Window_Closed">
+    <Grid>
+        <TextBox Name="DebugBox" IsReadOnly="True" HorizontalAlignment="Left" Margin="518,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="259" Height="391"/>
+        <local:DraggableNumeric x:Name="gridStartX" Text="Grid Start X:" Value="0" IsDecimal="True" HorizontalAlignment="Left" Height="26" Margin="10,7,0,0" VerticalAlignment="Top" Width="128"/>
+        <local:DraggableNumeric x:Name="gridStartY" Text="Grid Start Y:" Value="0" IsDecimal="True" HorizontalAlignment="Left" Height="26" Margin="10,33,0,0" VerticalAlignment="Top" Width="128"/>
+        <local:DraggableNumeric x:Name="gridStartZ" Text="Grid Start Z:" Value="0" IsDecimal="True" HorizontalAlignment="Left" Height="26" Margin="10,59,0,0" VerticalAlignment="Top" Width="128"/>
+        <local:DraggableNumeric x:Name="gridWidth" Text="Grid Width:" Value="2" IsDecimal="False" HorizontalAlignment="Left" Height="26" Margin="10,85,0,0" VerticalAlignment="Top" Width="128"/>
+        <local:DraggableNumeric x:Name="gridHeight" Text="Grid Height:" Value="2" IsDecimal="False" HorizontalAlignment="Left" Height="26" Margin="10,111,0,0" VerticalAlignment="Top" Width="128"/>
+        <local:DraggableNumeric x:Name="textureScale" Text="Texture Scale:" Value="0.5" IsDecimal="True" HorizontalAlignment="Left" Height="26" Margin="4,152,0,0" VerticalAlignment="Top" Width="134"/>
+        <local:DraggableNumeric x:Name="cameraX" Text="Camera X:" Value="0" IsDecimal="True" HorizontalAlignment="Left" Height="26" Margin="152,7,0,0" VerticalAlignment="Top" Width="128"/>
+        <local:DraggableNumeric x:Name="cameraY" Text="Camera Y:" Value="0" IsDecimal="True" HorizontalAlignment="Left" Height="26" Margin="152,33,0,0" VerticalAlignment="Top" Width="128"/>
+        <local:DraggableNumeric x:Name="cameraZ" Text="Camera Z:" Value="-5" IsDecimal="True" HorizontalAlignment="Left" Height="26" Margin="152,59,0,0" VerticalAlignment="Top" Width="128"/>
+        <Label Content="FPS:" HorizontalAlignment="Left" Margin="57,183,0,0" VerticalAlignment="Top"/>
+        <Label Name="fpsLabel" Content="0" HorizontalAlignment="Left" Margin="88,183,0,0" VerticalAlignment="Top"/>
+    </Grid>
+</Window>
