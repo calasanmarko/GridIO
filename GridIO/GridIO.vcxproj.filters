@@ -8,9 +8,11 @@
     <ClCompile Include="Output.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="VBO.cpp" />
+    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Textures.cpp" />
+    <ClCompile Include="DrawnEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EBO.h">
@@ -23,9 +25,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShaderProgram.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
@@ -41,6 +40,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GridSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Textures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawnEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

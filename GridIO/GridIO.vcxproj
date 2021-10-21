@@ -162,6 +162,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="DrawnEntity.cpp" />
     <ClCompile Include="GridIO.cpp" />
     <ClCompile Include="CameraSettings.cpp" />
     <ClCompile Include="EBO.cpp" />
@@ -169,7 +171,7 @@
     <ClCompile Include="Output.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Textures.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="VBO.cpp" />
   </ItemGroup>
@@ -179,13 +181,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraSettings.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="DrawnEntity.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="GridSettings.h" />
     <ClInclude Include="Output.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="stb_image.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Textures.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
   </ItemGroup>

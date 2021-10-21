@@ -4,107 +4,69 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Runtime.InteropServices;
 using System.Threading;
+using GridIOInterface;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
-namespace BlockIOInterface {
+namespace GridIOInterface {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
-
-        [DllImport("GridIO.dll")]
-        private static extern int MainRoutine();
-        [DllImport("GridIO.dll")]
-        private static extern void GetOutput(StringBuilder builder, int len);
-        [DllImport("GridIO.dll")]
-        private static extern void SetGridSettings(float startX, float startY, float startZ, int width, int height);
-        [DllImport("GridIO.dll")]
-        private static extern void SetTextureScale(float texScale);
-        [DllImport("GridIO.dll")]
-        private static extern void SetCameraPos(float camX, float camY, float camZ, float fov);
-        [DllImport("GridIO.dll")]
-        private static extern double GetFPS();
-        [DllImport("GridIO.dll")]
-        private static extern void CloseGLWindow();
-
+        public static ECSFramework framework => ECSFramework.instance;
         private StringBuilder debugBuilder;
+        private float[] pixels;
+        private int renderWidth;
+        private int renderHeight;
+        private System.Timers.Timer pixelTimer;
+        public EntityBarManager entityBarManager { get; private set; }
+        public ComponentBarManager componentBarManager { get; private set; }
 
         public MainWindow() {
             InitializeComponent();
+            entityBarManager = new EntityBarManager(this, entityBar);
+            componentBarManager = new ComponentBarManager(this, componentBar);
+        }
 
-            debugBuilder = new StringBuilder(300);
-            System.Timers.Timer debugTimer = new System.Timers.Timer(100);
-            debugTimer.Elapsed += DebugTimer_Elapsed;
-            debugTimer.Start();
-
-            Thread thread = new Thread(new ThreadStart(() => { MainRoutine(); }));
-            thread.Start();
-
-            System.Timers.Timer fpsTimer = new System.Timers.Timer(250);
-            fpsTimer.Elapsed += FpsTimer_Elapsed;
-            fpsTimer.Start();
-
-            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, new Action(() => {
-                gridStartX.TextChanged = gridParamsChanged;
-                gridStartY.TextChanged = gridParamsChanged;
-                gridStartZ.TextChanged = gridParamsChanged;
-                gridWidth.TextChanged = gridParamsChanged;
-                gridHeight.TextChanged = gridParamsChanged;
-                textureScale.TextChanged = scaleChanged;
-                cameraX.TextChanged = camChanged;
-                cameraY.TextChanged = camChanged;
-                cameraZ.TextChanged = camChanged;
-
-                CommitGridSettings();
-                CommitCameraSettings();
-                CommitScale();
+        private void PixelTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e) {
+            Dispatcher.Invoke(new Action(() => {
+                framework.UpdateSystems();
+                IntPtr pixelPtr = OpenGL.DrawFrame();
+                if (pixelPtr != IntPtr.Zero) {
+                    Marshal.Copy(pixelPtr, pixels, 0, renderWidth * renderHeight * 4);
+                    int stride = ((renderWidth * 32 + 31) & ~31) / 8;
+                    BitmapSource source = BitmapSource.Create(renderWidth, renderHeight, 1, 1, PixelFormats.Rgba128Float, null, pixels, stride * 4);
+                    renderImage.Source = source;
+                }
             }));
         }
 
-        private void FpsTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e) {
-            double fps = GetFPS();
-            Dispatcher.Invoke(new Action(() => { fpsLabel.Content = (int)fps; }));
-        }
-
-        private void DebugTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e) {
-            GetOutput(debugBuilder, debugBuilder.Capacity);
-            if (debugBuilder.Length > 0) {
-                string output = debugBuilder.ToString();
-                Action action = new Action(() => { DebugBox.Text += output; });
-                Dispatcher.Invoke(action);
-            }
-            debugBuilder.Clear();
-        }
-
-        private void CommitGridSettings() {
-            SetGridSettings(gridStartX.DecimalValue, gridStartY.DecimalValue, gridStartZ.DecimalValue, gridWidth.IntValue, gridHeight.IntValue);
-        }
-
-        private void CommitScale() {
-            SetTextureScale(textureScale.DecimalValue);
-        }
-
-        private void CommitCameraSettings() {
-            SetCameraPos(cameraX.DecimalValue, cameraY.DecimalValue, cameraZ.DecimalValue, 45);
-        }
-
-        private void gridParamsChanged(object sender, TextChangedEventArgs e) {
-            CommitGridSettings();
-        }
-
-        private void scaleChanged(object sender, TextChangedEventArgs e) {
-            CommitScale();
-        }
-
-        private void camChanged(object sender, TextChangedEventArgs e) {
-            CommitCameraSettings();
+        private void Window_Closed(object sender, EventArgs e) {
+            pixelTimer.Stop();
+            OpenGL.CloseGLWindow();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
-            
+            CalcRenderSize();
+            pixels = new float[renderWidth * renderHeight * 4];
+
+            OpenGL.SetSize(renderWidth, renderHeight);
+            OpenGL.InitContext();
+            framework.StartSystems();
+
+            pixelTimer = new System.Timers.Timer(1);
+            pixelTimer.Elapsed += PixelTimer_Elapsed;
+            pixelTimer.Start();
         }
 
-        private void Window_Closed(object sender, EventArgs e) {
-            CloseGLWindow();
+        private void CalcRenderSize() {
+            renderWidth = (int)renderImage.Width;
+            renderHeight = (int)renderImage.Height;
+        }
+
+        private void ImageGrid_SizeChanged(object sender, SizeChangedEventArgs e) {
+            renderImage.Width = e.NewSize.Width;
+            renderImage.Height = e.NewSize.Width * (9.0 / 16.0);
         }
     }
 }

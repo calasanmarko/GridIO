@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Runtime.InteropServices;
 
-namespace BlockIOInterface {
+namespace GridIOInterface {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
