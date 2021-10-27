@@ -10,7 +10,7 @@ string ReadFile(string path, stringstream* output) {
 		return res;
 	}
 	else {
-		printf("Error reading shader file.");
+		*output << "Error reading shader file.";
 	}
 }
 

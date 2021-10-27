@@ -7,121 +7,74 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280"
         Loaded="Window_Loaded"
-        Closed="Window_Closed">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition MinHeight="200" Height="250" MaxHeight="350"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="315" MinWidth="200" MaxWidth="400"></ColumnDefinition>
-            <ColumnDefinition Width="5"></ColumnDefinition>
-            <ColumnDefinition MinWidth="200"></ColumnDefinition>
-            <ColumnDefinition Width="5"></ColumnDefinition>
-            <ColumnDefinition Width="345" MinWidth="200" MaxWidth="400"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <StackPanel x:Name="entityBar" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Background="LightGray"/>
-        <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        <GridSplitter Grid.Row="0" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        <ScrollViewer Grid.Row="0" Grid.RowSpan="3" Grid.Column="4" HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Auto">
-            <StackPanel x:Name="componentBar" Background="LightGray">
+        Closed="Window_Closed" WindowState="Maximized">
+    <Window.CommandBindings>
+        <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
+    </Window.CommandBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Height="20">
+            <MenuItem Header="File">
+                <MenuItem Command="Save">
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="5"></RowDefinition>
+                <RowDefinition MinHeight="200" Height="250" MaxHeight="350"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="315" MinWidth="200" MaxWidth="400"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition MinWidth="200"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="345" MinWidth="200" MaxWidth="400"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel x:Name="entityBar" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Background="LightGray">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100"></ColumnDefinition>
+                        <ColumnDefinition Width="20"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Component #1" FontWeight="Bold"/>
-                    <Label Grid.Row="1" Grid.Column="0" Content="Field #1" />
-                    <Grid Grid.Row="1" Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center"></TextBox>
-                    </Grid>
-                    <Label Grid.Row="2" Grid.Column="0" Content="Field #2" />
-                    <Grid Grid.Row="2" Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition MinWidth="45"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition MinWidth="45"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition MinWidth="45"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Row="0" Grid.Column="0" Content="X: " />
-                        <TextBox Grid.Row="0" Grid.Column="1"></TextBox>
-                        <Label Grid.Row="0" Grid.Column="2" Content="Y: " />
-                        <TextBox Grid.Row="0" Grid.Column="3"></TextBox>
-                        <Label Grid.Row="0" Grid.Column="4" Content="Z: " />
-                        <TextBox Grid.Row="0" Grid.Column="5"></TextBox>
-                    </Grid>
-                </Grid>
-
-                <Border Height="1" Background="Gray" Margin="0,10,0,0" />
-
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="40"></RowDefinition>
-                        <RowDefinition Height="30"></RowDefinition>
-                        <RowDefinition Height="30"></RowDefinition>
-                        <RowDefinition Height="30"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100"></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Component #1" FontWeight="Bold"/>
-                    <Label Grid.Row="1" Grid.Column="0" Content="Field #1"/>
-                    <Grid Grid.Row="1" Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Row="0" Grid.Column="0" Height="25"></TextBox>
-                    </Grid>
-                    <Label Grid.Row="2" Grid.Column="0" Content="Field #2" />
-                    <Grid Grid.Row="2" Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition MinWidth="45"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Name="AAA" MinWidth="45" ></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition MinWidth="45"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Row="0" Grid.Column="0" Content="X: " />
-                        <TextBox Grid.Row="0" Grid.Column="1" Height="25"></TextBox>
-                        <Label Grid.Row="0" Grid.Column="2" Content="Y: " />
-                        <TextBox Grid.Row="0" Grid.Column="3" Height="25"></TextBox>
-                        <Label Grid.Row="0" Grid.Column="4" Content="Z: " />
-                        <TextBox Grid.Row="0" Grid.Column="5" Height="25"></TextBox>
-                    </Grid>
+                    <Button Name="addEntityButton" Grid.Column="0" Content="+" FontWeight="Bold" Click="addEntityButton_Click"/>
                 </Grid>
             </StackPanel>
-        </ScrollViewer>
-        <Grid Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" SizeChanged="ImageGrid_SizeChanged">
-            <Image Name="renderImage" VerticalAlignment="Center" />
+            <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <GridSplitter Grid.Row="0" Grid.RowSpan="3" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <ScrollViewer Grid.Row="0" Grid.RowSpan="3" Grid.Column="4" HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Auto">
+                <StackPanel x:Name="componentBar" Background="LightGray">
+                </StackPanel>
+            </ScrollViewer>
+            <Grid Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" SizeChanged="ImageGrid_SizeChanged">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Background="Gray" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button Name="playButton" Grid.Column="0" Content="|>" Width="30" Click="playButton_Click" />
+                    <Button Name="pauseButton" Grid.Column="1" Content="||" Width="30" Click="pauseButton_Click" IsEnabled="False" />
+                </Grid>
+                <Image Grid.Row="1" x:Name="renderImage" VerticalAlignment="Center" RenderTransformOrigin="0.5, 0.5" MouseWheel="renderImage_MouseWheel">
+                    <Image.RenderTransform>
+                        <ScaleTransform ScaleY="-1" />
+                    </Image.RenderTransform>
+                </Image>
+            </Grid>
+            <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+                <TabControl>
+                    <TabItem Header="Output">
+                        <ScrollViewer ScrollChanged="ScrollViewer_ScrollChanged">
+                            <StackPanel Name="outputPanel" />
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Grid>
         </Grid>
-        <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
-            
-        </Grid>
-    </Grid>
+    </DockPanel>
 </Window>

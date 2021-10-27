@@ -6,6 +6,7 @@ CameraSettings::CameraSettings() {
 	this->zPos = -5;
 	this->fov = glm::radians(45.0f);
 	this->color = Color();
+	this->valid = true;
 }
 
 CameraSettings::CameraSettings(float xPos, float yPos, float zPos, float fov, Color color) {
@@ -14,4 +15,5 @@ CameraSettings::CameraSettings(float xPos, float yPos, float zPos, float fov, Co
 	this->zPos = zPos;
 	this->fov = glm::radians(fov);
 	this->color = color;
+	this->valid = true;
 }

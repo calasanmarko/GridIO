@@ -21,6 +21,7 @@
 #include "GridSettings.h"
 #include "CameraSettings.h"
 #include "DrawnEntity.h"
+#include "LinkedList.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
@@ -33,7 +34,6 @@ GLFWwindow* window;
 GridSettings gridSettings;
 CameraSettings camSettings;
 stringstream output;
-float vertScale = 0.5f;
 double currFPS = 0;
 
 ShaderProgram* shaderProgram;
@@ -51,11 +51,10 @@ int width;
 int height;
 const int maxWidth = 2000;
 const int maxHeight = 2000;
-bool pixelsDrawn = false;
 
 const int maxDrawnEntities = 1000;
 int drawnEntityCount = 0;
-DrawnEntity* drawnEntities[maxDrawnEntities];
+List<DrawnEntity*> drawnEntities;
 Textures* textures;
 
 float pixels[maxWidth * maxHeight];
@@ -89,43 +88,68 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	return TRUE;
 }
 
+void DestroyContext() {
+	vao->Destroy();
+	squareVBO->Destroy();
+	squareEBO->Destroy();
+	shaderProgram->Destroy();
+	glfwDestroyWindow(window);
+	glfwTerminate();
+}
+
+
 extern "C" {
 	__declspec(dllexport) void SetSize(int newWidth, int newHeight) {
-		/*width = newWidth;
+		width = newWidth;
 		height = newHeight;
-		glViewport(0, 0, width, height);*/
+		glViewport(0, 0, width, height);
 	}
 
-	__declspec(dllexport) float* DrawFrame() {
-		double frameStartTime = glfwGetTime();
-		glClearColor(camSettings.color.r, camSettings.color.g, camSettings.color.b, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		textures->Bind();
+	__declspec(dllexport) void DrawFrame() {
+		if (camSettings.valid) {
+			glClearColor(camSettings.color.r, camSettings.color.g, camSettings.color.b, 1);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		mat4 view = mat4(1.0f);
-		mat4 proj = mat4(1.0f);
-		view = translate(view, vec3(camSettings.xPos, camSettings.yPos, camSettings.zPos));
-		proj = perspective(camSettings.fov, (float)width / height, 0.1f, 100.0f);
-		glUniformMatrix4fv(viewUniform, 1, GL_FALSE, value_ptr(view));
-		glUniformMatrix4fv(projUniform, 1, GL_FALSE, value_ptr(proj));
-		glUniform1f(scaleUniform, vertScale);
+			mat4 view = mat4(1.0f);
+			mat4 proj = mat4(1.0f);
+			view = translate(view, vec3(camSettings.xPos, camSettings.yPos, camSettings.zPos));
+			proj = perspective(camSettings.fov, (float)width / height, 0.1f, 100.0f);
+			glUniformMatrix4fv(viewUniform, 1, GL_FALSE, value_ptr(view));
+			glUniformMatrix4fv(projUniform, 1, GL_FALSE, value_ptr(proj));
 
-		vao->Bind();
-		for (int i = 0; i < drawnEntityCount; i++) {
-			mat4 id = mat4(1.0f);
-			glUniformMatrix4fv(modelUniform, 1, GL_FALSE, value_ptr(id));
-			glDrawElements(GL_TRIANGLES, sizeof(squareInd) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+			vao->Bind();
+			
+			Node<DrawnEntity*>* currEntityNode = drawnEntities.head;
+			while (currEntityNode != nullptr) {
+				DrawnEntity* currEntity = currEntityNode->value;
+
+				textures->Bind(currEntity->textureID);
+				glUniform1i(texUniform, currEntity->textureID);
+				glUniformMatrix4fv(modelUniform, 1, GL_FALSE, value_ptr(currEntity->GetModelMat()));
+				glUniform3fv(scaleUniform, 1, value_ptr(currEntity->scale));
+				glDrawElements(GL_TRIANGLES, sizeof(squareInd) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+
+				currEntityNode = currEntityNode->next;
+			}
+		}
+		else {
+			glClearColor(0, 0, 0, 1);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
+		glReadPixels(0, 0, width, height, GL_RGBA, GL_FLOAT, (void*)pixels);
 		glfwSwapInterval(0);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+	}
 
-		glReadPixels(0, 0, width, height, GL_RGBA, GL_FLOAT, (void*)pixels);
-		pixelsDrawn = true;
-
-		currFPS = 1 / (glfwGetTime() - frameStartTime);
-		return pixels;
+	__declspec(dllexport) void StartFrameLoop() {
+		double frameStartTime;
+		while (!glfwWindowShouldClose(window)) {
+			frameStartTime = glfwGetTime();
+			DrawFrame();
+			currFPS = 1 / (glfwGetTime() - frameStartTime);
+		}
 	}
 
 	__declspec(dllexport) int InitContext() {
@@ -135,12 +159,9 @@ extern "C" {
 		glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, GL_TRUE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-		width = 800;
-		height = 800;
-
 		window = glfwCreateWindow(width, height, "test", NULL, NULL);
 		glfwSetWindowPos(window, 800, 250);
-		//glfwHideWindow(window);
+		glfwHideWindow(window);
 
 		if (window == nullptr) {
 			output << "WINDOW FAIL\n";
@@ -176,6 +197,7 @@ extern "C" {
 
 		stbi_set_flip_vertically_on_load(true);
 		textures = new Textures(&output);
+		drawnEntities = List<DrawnEntity*>();
 
 		texUniform = glGetUniformLocation(shaderProgram->id, "tex0");
 		scaleUniform = glGetUniformLocation(shaderProgram->id, "scale");
@@ -183,9 +205,10 @@ extern "C" {
 		projUniform = glGetUniformLocation(shaderProgram->id, "proj");
 		modelUniform = glGetUniformLocation(shaderProgram->id, "model");
 		shaderProgram->Activate();
-		glUniform1i(texUniform, 0);
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		return EXIT_SUCCESS;
 	}
@@ -199,12 +222,12 @@ extern "C" {
 		gridSettings = GridSettings(startX, startY, startZ, width, height);
 	}
 
-	__declspec(dllexport) void SetTextureScale(float texScale) {
-		vertScale = texScale;
-	}
-
 	__declspec(dllexport) void SetCameraPos(float camX, float camY, float camZ, float camFOV) {
 		camSettings = CameraSettings(camX, camY, camZ, camFOV, camSettings.color);
+	}
+
+	__declspec(dllexport) void SetValidCamera(bool valid) {
+		camSettings.valid = false;
 	}
 
 	__declspec(dllexport) void SetBackgroundColor(float r, float g, float b) {
@@ -219,12 +242,19 @@ extern "C" {
 	}
 
 	__declspec(dllexport) int CreateDrawnEntity(int textureID) {
-		drawnEntities[drawnEntityCount] = new DrawnEntity(textureID);
-		return drawnEntityCount++;
+		return drawnEntities.Add(new DrawnEntity(textureID));
+	}
+
+	__declspec(dllexport) void RemoveDrawnEntity(int drawnEntityID) {
+		drawnEntities.Remove(drawnEntityID);
 	}
 
 	__declspec(dllexport) void SetDrawnEntityPosition(int entityID, float x, float y, float z) {
-		drawnEntities[entityID]->position = vec3(x, y, z);
+		drawnEntities.Get(entityID)->position = vec3(x, y, z);
+	}
+
+	__declspec(dllexport) void SetDrawnEntityScale(int entityID, float x, float y, float z) {
+		drawnEntities.Get(entityID)->scale = vec3(x, y, z);
 	}
 
 	__declspec(dllexport) double GetFPS() {
@@ -232,12 +262,10 @@ extern "C" {
 	}
 
 	__declspec(dllexport) float* GetPixels() {
-		return pixelsDrawn ? pixels : NULL;
+		return pixels;
 	}
 
 	__declspec(dllexport) void CloseGLWindow() {
-		shaderProgram->Destroy();
-		glfwDestroyWindow(window);
-		glfwTerminate();
+		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 }

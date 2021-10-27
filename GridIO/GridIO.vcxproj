@@ -176,15 +176,12 @@
     <ClCompile Include="VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="default.frag" />
-    <None Include="default.vert" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="CameraSettings.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="DrawnEntity.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="GridSettings.h" />
+    <ClInclude Include="LinkedList.h" />
     <ClInclude Include="Output.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
@@ -195,6 +192,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="kockle.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\GridIOInterface\bin\Debug\netcoreapp3.1\default.frag" />
+    <None Include="..\GridIOInterface\bin\Debug\netcoreapp3.1\default.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
