@@ -1,18 +1,28 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include "Color.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-struct CameraSettings
+using namespace glm;
+
+class CameraSettings
 {
-public:
-	float xPos;
-	float yPos;
-	float zPos;
+private:
+	vec3 pos;
 	float fov;
+	mat4 view;
+	mat4 proj;
+public:
 	Color color;
 	bool valid;
 
 	CameraSettings();
-	CameraSettings(float xPos, float yPos, float zPos, float fov, Color color);
+	CameraSettings(vec3 pos, float fov, Color color);
+	void SetCameraPos(vec3 pos, float fov);
+	vec3 GetCameraPos();
+	mat4* GetViewMat();
+	mat4* GetProjMat();
+	float GetFOV();
 };

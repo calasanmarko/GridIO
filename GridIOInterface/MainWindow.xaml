@@ -55,11 +55,15 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Button Name="playButton" Grid.Column="0" Content="|>" Width="30" Click="playButton_Click" />
                     <Button Name="pauseButton" Grid.Column="1" Content="||" Width="30" Click="pauseButton_Click" IsEnabled="False" />
+                    <Label Name="fpsLabel" Grid.Column="2" Content="FPS: 0" Foreground="White" FontWeight="Bold" FontSize="18" />
+                    <Label Name="internalFpsLabel" Grid.Column="3" Content="Internal FPS: 0" Foreground="White" FontWeight="Bold" FontSize="18" />
                 </Grid>
-                <Image Grid.Row="1" x:Name="renderImage" VerticalAlignment="Center" RenderTransformOrigin="0.5, 0.5" MouseWheel="renderImage_MouseWheel">
+                <Image Grid.Row="1" x:Name="renderImage" VerticalAlignment="Center" RenderTransformOrigin="0.5, 0.5" MouseWheel="renderImage_MouseWheel" MouseRightButtonDown="renderImage_MouseRightButtonDown" MouseRightButtonUp="renderImage_MouseRightButtonUp" MouseMove="renderImage_MouseMove">
                     <Image.RenderTransform>
                         <ScaleTransform ScaleY="-1" />
                     </Image.RenderTransform>
@@ -69,7 +73,7 @@
             <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
                 <TabControl>
                     <TabItem Header="Output">
-                        <ScrollViewer ScrollChanged="ScrollViewer_ScrollChanged">
+                        <ScrollViewer local:AutoScrollBehavior.AutoScroll="True">
                             <StackPanel Name="outputPanel" />
                         </ScrollViewer>
                     </TabItem>

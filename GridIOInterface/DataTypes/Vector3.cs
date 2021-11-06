@@ -17,6 +17,12 @@ namespace GridIOInterface {
             this.z = z;
         }
 
+        public Vector3(Vector2 xy, float z) {
+            this.x = xy.x;
+            this.y = xy.y;
+            this.z = z;
+        }
+
         static Vector3() {
             zero = new Vector3(0, 0, 0);
             one = new Vector3(1, 1, 1);
@@ -38,12 +44,20 @@ namespace GridIOInterface {
             return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
         }
 
+        public static Vector3 operator -(Vector3 a, Vector2 b) {
+            return new Vector3(a.x - b.x, a.y - b.y, a.z);
+        }
+
         public static Vector3 operator *(Vector3 a, float b) {
             return new Vector3(a.x * b, a.y * b, a.z * b);
         }
 
         public static Vector3 operator /(Vector3 a, float b) {
             return new Vector3(a.x / b, a.y / b, a.z / b);
+        }
+
+        public override string ToString() {
+            return "(" + x + ", " + y + ", " + z + ")";
         }
     }
 }

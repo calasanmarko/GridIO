@@ -2,7 +2,7 @@
   "profiles": {
     "BlockIOInterface": {
       "commandName": "Project",
-      "nativeDebugging": false
+      "nativeDebugging": true
     }
   }
 }

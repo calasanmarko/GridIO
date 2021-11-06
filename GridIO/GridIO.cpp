@@ -4,6 +4,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define WIN32_LEAN_AND_MEAN
+#define INTEROP_TRUE 1
+#define INTEROP_FALSE 0
 
 #include <windows.h>
 #include <gl/glew.h>
@@ -22,6 +24,7 @@
 #include "CameraSettings.h"
 #include "DrawnEntity.h"
 #include "LinkedList.h"
+#include "FBO.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
@@ -34,13 +37,16 @@ GLFWwindow* window;
 GridSettings gridSettings;
 CameraSettings camSettings;
 stringstream output;
-double currFPS = 0;
+int* fpsPointer;
+bool stopFrameLoop = false;
 
 ShaderProgram* shaderProgram;
 VAO* vao;
 VBO* squareVBO;
 EBO* squareEBO;
+FBO* framebuffer;
 
+GLint viewport[4];
 GLuint texUniform;
 GLuint scaleUniform;
 GLuint viewUniform;
@@ -57,7 +63,11 @@ int drawnEntityCount = 0;
 List<DrawnEntity*> drawnEntities;
 Textures* textures;
 
-float pixels[maxWidth * maxHeight];
+float lastMouseToWorldPos[2];
+
+int* engineDoneFrame;
+int* glDoneFrame;
+void* pixels;
 GLfloat squareVert[] =
 { //     COORDINATES     /        COLORS      /   TexCoord  //
 	-1.0f, -1.0f, 0.0f,		1.00f, 1.00f, 0.00f,	0.0f, 0.0f,	// Bottom left
@@ -97,62 +107,96 @@ void DestroyContext() {
 	glfwTerminate();
 }
 
+void DrawScene() {
+	if (camSettings.valid) {
+		glClearColor(camSettings.color.r, camSettings.color.g, camSettings.color.b, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glUniformMatrix4fv(viewUniform, 1, GL_FALSE, value_ptr(*camSettings.GetViewMat()));
+		glUniformMatrix4fv(projUniform, 1, GL_FALSE, value_ptr(*camSettings.GetProjMat()));
+
+		vao->Bind();
+
+		Node<DrawnEntity*>* currEntityNode = drawnEntities.head;
+		while (currEntityNode != nullptr) {
+			DrawnEntity* currEntity = currEntityNode->value;
+
+			textures->Bind(currEntity->textureID);
+			glUniform1i(texUniform, currEntity->textureID);
+			glUniformMatrix4fv(modelUniform, 1, GL_FALSE, value_ptr(currEntity->GetModelMat()));
+			glUniform3fv(scaleUniform, 1, value_ptr(currEntity->scale));
+			glDrawElements(GL_TRIANGLES, sizeof(squareInd) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+
+			currEntityNode = currEntityNode->next;
+		}
+	}
+	else {
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+}
 
 extern "C" {
+	__declspec(dllexport) void AttachContext() {
+		glfwMakeContextCurrent(window);
+	}
+
+	__declspec(dllexport) void ReleaseContext() {
+		glfwMakeContextCurrent(NULL);
+	}
+
 	__declspec(dllexport) void SetSize(int newWidth, int newHeight) {
 		width = newWidth;
 		height = newHeight;
 		glViewport(0, 0, width, height);
+		viewport[2] = width;
+		viewport[3] = height;
 	}
 
 	__declspec(dllexport) void DrawFrame() {
-		if (camSettings.valid) {
-			glClearColor(camSettings.color.r, camSettings.color.g, camSettings.color.b, 1);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			mat4 view = mat4(1.0f);
-			mat4 proj = mat4(1.0f);
-			view = translate(view, vec3(camSettings.xPos, camSettings.yPos, camSettings.zPos));
-			proj = perspective(camSettings.fov, (float)width / height, 0.1f, 100.0f);
-			glUniformMatrix4fv(viewUniform, 1, GL_FALSE, value_ptr(view));
-			glUniformMatrix4fv(projUniform, 1, GL_FALSE, value_ptr(proj));
-
-			vao->Bind();
-			
-			Node<DrawnEntity*>* currEntityNode = drawnEntities.head;
-			while (currEntityNode != nullptr) {
-				DrawnEntity* currEntity = currEntityNode->value;
-
-				textures->Bind(currEntity->textureID);
-				glUniform1i(texUniform, currEntity->textureID);
-				glUniformMatrix4fv(modelUniform, 1, GL_FALSE, value_ptr(currEntity->GetModelMat()));
-				glUniform3fv(scaleUniform, 1, value_ptr(currEntity->scale));
-				glDrawElements(GL_TRIANGLES, sizeof(squareInd) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
-
-				currEntityNode = currEntityNode->next;
-			}
+		while (*engineDoneFrame == INTEROP_FALSE && !stopFrameLoop) {}
+		if (stopFrameLoop) {
+			return;
 		}
-		else {
-			glClearColor(0, 0, 0, 1);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
+		*engineDoneFrame = INTEROP_FALSE;
+		AttachContext();
+		glEnable(GL_DEPTH_TEST);
+		DrawScene();
+		glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, (void*)pixels);
 
-		glReadPixels(0, 0, width, height, GL_RGBA, GL_FLOAT, (void*)pixels);
+
 		glfwSwapInterval(0);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		*glDoneFrame = INTEROP_TRUE;
+		ReleaseContext();
 	}
 
 	__declspec(dllexport) void StartFrameLoop() {
-		double frameStartTime;
-		while (!glfwWindowShouldClose(window)) {
-			frameStartTime = glfwGetTime();
+		stopFrameLoop = false;
+		*glDoneFrame = false;
+		double startTime = 0;
+		while (!glfwWindowShouldClose(window) && !stopFrameLoop) {
+			startTime = glfwGetTime();
 			DrawFrame();
-			currFPS = 1 / (glfwGetTime() - frameStartTime);
+			*fpsPointer = (int)(1.0 / (glfwGetTime() - startTime));
 		}
+		stopFrameLoop = false;
 	}
 
-	__declspec(dllexport) int InitContext() {
+	__declspec(dllexport) void StopFrameLoop() {
+		stopFrameLoop = true;
+	}
+
+	__declspec(dllexport) void UpdatePixels(byte* pixels) {
+		/*for (int i = 0; i < width * height * 4; i++) {
+			*pixels = 255;
+			pixels++;
+		}*/
+	}
+
+	__declspec(dllexport) int InitContext(int* newEngineDoneFrame, int* newGlDoneFrame, void* newPixels, int* newFpsPointer) {
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -177,6 +221,11 @@ extern "C" {
 
 		glViewport(0, 0, width, height);
 
+		engineDoneFrame = newEngineDoneFrame;
+		glDoneFrame = newGlDoneFrame;
+		pixels = newPixels;
+		fpsPointer = newFpsPointer;
+
 		Shader vertexShader(GL_VERTEX_SHADER, "default.vert", &output);
 		Shader fragShader(GL_FRAGMENT_SHADER, "default.frag", &output);
 		shaderProgram = new ShaderProgram(&vertexShader, &fragShader, &output);
@@ -195,6 +244,8 @@ extern "C" {
 		squareVBO->Unbind();
 		squareEBO->Unbind();
 
+		framebuffer = new FBO(width, height, &output);
+
 		stbi_set_flip_vertically_on_load(true);
 		textures = new Textures(&output);
 		drawnEntities = List<DrawnEntity*>();
@@ -206,7 +257,6 @@ extern "C" {
 		modelUniform = glGetUniformLocation(shaderProgram->id, "model");
 		shaderProgram->Activate();
 
-		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -223,7 +273,7 @@ extern "C" {
 	}
 
 	__declspec(dllexport) void SetCameraPos(float camX, float camY, float camZ, float camFOV) {
-		camSettings = CameraSettings(camX, camY, camZ, camFOV, camSettings.color);
+		camSettings = CameraSettings(vec3(camX, camY, camZ), camFOV, camSettings.color);
 	}
 
 	__declspec(dllexport) void SetValidCamera(bool valid) {
@@ -257,13 +307,30 @@ extern "C" {
 		drawnEntities.Get(entityID)->scale = vec3(x, y, z);
 	}
 
-	__declspec(dllexport) double GetFPS() {
-		return currFPS;
+	void MatToArray(mat4 mat, GLdouble* array) {
+		const float* matSource = (const float*)value_ptr(mat);
+			for (int i = 0; i < 16; i++) {
+				array[i] = matSource[i];
+			}
 	}
 
-	__declspec(dllexport) float* GetPixels() {
-		return pixels;
+	__declspec(dllexport) float* ScreenToWorldPos(float mouseX, float mouseY) {
+		mat4 view = *camSettings.GetViewMat();
+		mat4 proj = mat4(1.0f);
+		proj = perspective(radians(camSettings.GetFOV()), (float)width / height, 0.1f, camSettings.GetCameraPos().z);
+
+		GLdouble viewArr[16];
+		GLdouble projArr[16];
+		MatToArray(view, viewArr);
+		MatToArray(proj, projArr);
+
+		GLdouble x, y, z;
+		gluUnProject(width - mouseX, height - mouseY, 1, viewArr, projArr, viewport, &x, &y, &z);
+		lastMouseToWorldPos[0] = x;
+		lastMouseToWorldPos[1] = y;
+		return lastMouseToWorldPos;
 	}
+
 
 	__declspec(dllexport) void CloseGLWindow() {
 		glfwSetWindowShouldClose(window, GL_TRUE);

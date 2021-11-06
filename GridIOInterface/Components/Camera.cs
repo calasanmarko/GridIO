@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Windows.Input;
 
 namespace GridIOInterface {
     public class Camera : Component {
@@ -19,6 +20,15 @@ namespace GridIOInterface {
 
         public Camera(Color backgroundColor) {
             this.backgroundColor = new Vector3(backgroundColor.R / 255f, backgroundColor.G / 255f, backgroundColor.B / 255f);
+        }
+
+        public Vector2 ScreenToWorldPos(Vector2 screenPos) {
+            IntPtr output = OpenGL.ScreenToWorldPos(screenPos.x, screenPos.y);
+            unsafe {
+                float* x = (float*)output;
+                float* y = x + 1;
+                return new Vector2(*x, *y);
+            }
         }
     }
 }

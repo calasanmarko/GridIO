@@ -13,6 +13,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DrawnEntity.cpp" />
     <ClCompile Include="Textures.cpp" />
+    <ClCompile Include="FBO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EBO.h">
@@ -52,6 +53,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LinkedList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

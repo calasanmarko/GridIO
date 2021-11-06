@@ -57,7 +57,7 @@ namespace GridIOInterface {
         public void LoadPreviewCamera() {
             previewCameraEntity = CreateEntity("Preview Camera", true);
             previewCameraEntity.transform.position = new Vector3(0, 0, -10);
-            previewCamera = new Camera(Color.SkyBlue);
+            previewCamera = new Camera(new Vector3(0.1f, 0.1f, 0.1f));
             AddComponent(previewCamera, previewCameraEntity, true);
         }
 

@@ -11,7 +11,7 @@ class DrawnEntity {
 public:
 	int textureID;
 	vec3 position;
-	vec3 scale;
+	vec2 scale;
 
 	DrawnEntity(int textureID);
 	mat4 GetModelMat();

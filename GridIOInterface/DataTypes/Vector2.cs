@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Text;
 
 namespace GridIOInterface {
@@ -20,6 +21,10 @@ namespace GridIOInterface {
             one = new Vector2(1, 1);
         }
 
+        public static explicit operator Vector2(Point point) {
+            return new Vector2((float)point.X, (float)point.Y);
+        }
+
         public static explicit operator Vector2(Vector3 vec3) {
             return new Vector2(vec3.x, vec3.y);
         }
@@ -38,6 +43,10 @@ namespace GridIOInterface {
 
         public static Vector2 operator /(Vector2 a, float b) {
             return new Vector2(a.x / b, a.y / b);
+        }
+
+        public override string ToString() {
+            return "(" + x + ", " + y + ")";
         }
     }
 }

@@ -36,7 +36,7 @@ void Textures::AddTextures(int addCount, const char** paths, GLenum colorFormat)
 }
 
 void Textures::Bind(int textureID) {
-	glActiveTexture(GL_TEXTURE0 + textureID);
+	//glActiveTexture(GL_TEXTURE0 + textureID);
 	glBindTexture(GL_TEXTURE_2D, ids[textureID]);
 }
 

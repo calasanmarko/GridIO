@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -19,6 +20,7 @@ namespace GridIOInterface {
         private Entity entity;
         private readonly List<Component> components;
         private readonly HashSet<TextBox> textBoxes;
+        private readonly Timer refreshTimer;
         private bool skipTextChanged = false;
         private bool initTextBoxAssignment = false;
 
@@ -51,6 +53,8 @@ namespace GridIOInterface {
             };
             components = new List<Component>();
             textBoxes = new HashSet<TextBox>();
+            refreshTimer = new Timer(1);
+            refreshTimer.Elapsed += (a, b) => RefreshValues();
             LoadAddPanel();
         }
 
@@ -240,21 +244,29 @@ namespace GridIOInterface {
             addButton.Click += AddButton_Click;
             panel.Children.Add(addButton);
             panel.Children.Add(addPanel);
-
-            window.NewPreview();
         }
 
-        public void RefreshValues() {
-            foreach (TextBox textBox in textBoxes) {
-                Component component = (Component)textBox.GetValue(componentProperty);
-                FieldInfo field = (FieldInfo)textBox.GetValue(fieldProperty);
-                string fieldData = (string)textBox.GetValue(fieldDataProperty);
+        private void RefreshValues() {
+            window.Dispatcher.Invoke(() => {
+                foreach (TextBox textBox in textBoxes) {
+                    Component component = (Component)textBox.GetValue(componentProperty);
+                    FieldInfo field = (FieldInfo)textBox.GetValue(fieldProperty);
+                    string fieldData = (string)textBox.GetValue(fieldDataProperty);
 
-                string newValue = ProcessField(component, field, fieldData);
-                if (textBox.Text != newValue) {
-                    SetTextWithoutEvent(textBox, newValue);
+                    string newValue = ProcessField(component, field, fieldData);
+                    if (textBox.Text != newValue && !textBox.IsKeyboardFocused) {
+                        SetTextWithoutEvent(textBox, newValue);
+                    }
                 }
-            }
+            });
+        }
+
+        public void StartRefreshTimer() {
+            refreshTimer.Start();
+        }
+
+        public void StopRefreshTimer() {
+            refreshTimer.Stop();
         }
 
         private string ProcessField(Component component, FieldInfo field, string fieldData) {
@@ -381,7 +393,7 @@ namespace GridIOInterface {
                 if (component.GetType() == typeof(EntityInfo)) {
                     window.entityBarManager.RefreshEntityName(((EntityInfo)component).entity);
                 }
-                window.NewPreview();
+                window.renderManager.RequestPreview();
             }
         }
 

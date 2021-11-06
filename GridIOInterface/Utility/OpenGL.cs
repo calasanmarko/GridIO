@@ -6,7 +6,11 @@ using System.Text;
 namespace GridIOInterface {
     public static class OpenGL {
         [DllImport("GridIO.dll")]
-        public static extern void InitContext();
+        public static unsafe extern void InitContext(IntPtr engineDoneFrame, IntPtr glDoneFrame, IntPtr pixels, IntPtr fpsPointer);
+        [DllImport("GridIO.dll")]
+        public static extern void AttachContext();
+        [DllImport("GridIO.dll")]
+        public static extern void ReleaseContext();
         [DllImport("GridIO.dll")]
         public static extern void GetOutput(StringBuilder builder, int len);
         [DllImport("GridIO.dll")]
@@ -32,11 +36,13 @@ namespace GridIOInterface {
         [DllImport("GridIO.dll")]
         public static extern void StartFrameLoop();
         [DllImport("GridIO.dll")]
+        public static extern void StopFrameLoop();
+        [DllImport("GridIO.dll")]
         public static extern void DrawFrame();
         [DllImport("GridIO.dll")]
-        public static extern IntPtr GetPixels();
+        public static extern void UpdatePixels(IntPtr pixels);
         [DllImport("GridIO.dll")]
-        public static extern double GetFPS();
+        public static extern IntPtr ScreenToWorldPos(float mouseX, float mouseY);
         [DllImport("GridIO.dll")]
         public static extern void CloseGLWindow();
     }

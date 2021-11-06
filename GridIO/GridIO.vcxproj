@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DrawnEntity.cpp" />
+    <ClCompile Include="FBO.cpp" />
     <ClCompile Include="GridIO.cpp" />
     <ClCompile Include="CameraSettings.cpp" />
     <ClCompile Include="EBO.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="DrawnEntity.h" />
     <ClInclude Include="EBO.h" />
+    <ClInclude Include="FBO.h" />
     <ClInclude Include="GridSettings.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="Output.h" />
